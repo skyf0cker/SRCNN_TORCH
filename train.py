@@ -43,6 +43,21 @@ def train(epoch):
     print("===> Epoch {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(train_data_loader)))
 
 
+def test():
+    avg_psnr = 0
+    for batch in testing_data_loader:
+        input, target = Variable(batch[0]), Variable(batch[1])
+        if use_cuda:
+            input = input.cuda()
+            target = target.cuda()
+
+        prediction = srcnn(input)
+        mse = criterion(prediction, target)
+        psnr = 10 * log10(1 / mse.data[0])
+        avg_psnr += psnr
+    print("===> Avg. PSNR: {:.4f} dB".format(
+        avg_psnr / len(testing_data_loader)))
+
 
 def checkpoint(epoch):
     model_out_path = "model_epoch_{}.pth".format(epoch)
